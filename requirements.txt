@@ -1,0 +1,39 @@
+# =========================================
+# 🧠 ChomskyAgent - Requerimientos Python (Python 3.13+)
+# =========================================
+
+# --- Flask y utilidades web ---
+Flask>=3.0.3
+Flask-Cors>=4.0.0
+Werkzeug>=3.0.3
+itsdangerous>=2.1.2
+Jinja2>=3.1.4
+
+# --- Analizador y lógica lingüística ---
+nltk>=3.9
+lark-parser>=0.12.0
+regex>=2024.9.11
+
+# --- Visualización y gráficos ---
+graphviz>=0.20.3
+networkx>=3.4
+matplotlib>=3.9
+
+# --- IA local y NLP (solo lo simple y liviano) ---
+spacy>=3.8.2
+scikit-learn>=1.5.2
+numpy>=2.1.1
+pandas>=2.2.3
+
+# --- Reportes PDF ---
+reportlab>=4.4.4
+pdfkit>=1.0.0
+
+# --- Utilidades varias ---
+colorama>=0.4.6
+python-dotenv>=1.0.1
+requests>=2.32.3
+
+# --- Testing ---
+pytest>=8.3.2
+pytest-cov>=5.0.0
