@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2 class="text-3xl font-bold text-gray-800 mb-6">Acerca de ChomskyAgent</h2>
+
+<div class="bg-white p-6 rounded-xl shadow-md border border-mintgreen max-w-3xl">
+
+    <p class="text-gray-700 mb-4">
+        ChomskyAgent es una herramienta web diseñada para analizar, clasificar y visualizar
+        gramáticas formales y autómatas dentro de la Jerarquía de Chomsky. Incluye un
+        agente explicativo, un modo tutor interactivo y la capacidad de generar reportes PDF.
+    </p>
+
+    <p class="text-gray-700 mb-4">
+        El proyecto combina:
+    </p>
+
+    <ul class="list-disc pl-6 text-gray-700">
+        <li>Python (Flask) para la API</li>
+        <li>TailwindCSS para la interfaz moderna</li>
+        <li>Graphviz para diagramas</li>
+        <li>Módulos propios para análisis formal</li>
+        <li>IA explicativa local (Reasoner + NLP)</li>
+    </ul>
+
+</div>
+
+{% endblock %}

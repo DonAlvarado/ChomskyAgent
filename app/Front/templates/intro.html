@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="w-full flex flex-col items-center justify-center mt-28 text-center space-y-6">
+    <h2 class="text-5xl font-bold text-turquoise">
+        Bienvenido a ChomskyAgent
+    </h2>
+
+    <p class="max-w-2xl text-xl text-gray-600 leading-relaxed">
+        Sistema web para analizar gramáticas y autómatas según la Jerarquía de Chomsky,
+        generar explicaciones, diagramas y reportes inteligentes.
+    </p>
+
+    <a href="/dashboard"
+       class="mt-4 px-8 py-3 bg-turquoise text-white rounded-lg shadow hover:bg-turquoise/80 transition">
+       Ir al Dashboard
+    </a>
+</div>
+
+
+{% endblock %}

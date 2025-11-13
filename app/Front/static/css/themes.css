@@ -1,0 +1,80 @@
+/* ===========================
+   Paleta base del sistema
+   =========================== */
+
+:root {
+    --color-turquoise: #40E0D0;
+    --color-cyanlight: #79ECE0;
+    --color-celeste: #B2F7EF;
+    --color-mintgreen: #D1F7F3;
+    --color-mintcream: #EFF7F6;
+    --color-text-main: #1f2933;
+}
+
+/* Tema claro básico */
+body.theme-light {
+    background-color: var(--color-mintcream);
+    color: var(--color-text-main);
+}
+
+/* Tema oscuro simple (opcional) */
+body.theme-dark {
+    background-color: #0b1120;
+    color: #e5e7eb;
+}
+
+/* Componente genérico de tarjeta */
+.ca-card {
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    background-color: #ffffff;
+    border: 1px solid var(--color-mintgreen);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+}
+
+/* Variante de tarjeta con gradiente */
+.ca-card-gradient {
+    background: linear-gradient(135deg, var(--color-celeste), var(--color-mintcream));
+}
+
+/* Botón genérico */
+.ca-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1.2rem;
+    border-radius: 0.65rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    background-color: var(--color-turquoise);
+    color: #ffffff;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.ca-btn:hover {
+    transform: translateY(-1px);
+    background-color: var(--color-cyanlight);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.22);
+}
+
+/* Badges por tipo de lenguaje */
+.badge-type-0 {
+    background-color: #111827;
+    color: #f9fafb;
+}
+
+.badge-type-1 {
+    background-color: #4b5563;
+    color: #f9fafb;
+}
+
+.badge-type-2 {
+    background-color: #2563eb;
+    color: #eff6ff;
+}
+
+.badge-type-3 {
+    background-color: #16a34a;
+    color: #ecfdf3;
+}

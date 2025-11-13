@@ -1,0 +1,60 @@
+/* ===========================
+   Keyframes de animación
+   =========================== */
+
+@keyframes ca-fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ca-slide-up {
+    from { opacity: 0; transform: translateY(25px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ca-scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ca-pulse-soft {
+    0%   { box-shadow: 0 0 0 0 rgba(64, 224, 208, 0.4); }
+    70%  { box-shadow: 0 0 0 12px rgba(64, 224, 208, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(64, 224, 208, 0); }
+}
+
+/* ===========================
+   Clases utilitarias
+   =========================== */
+
+.ca-anim-fade-in {
+    animation: ca-fade-in 0.4s ease-out forwards;
+}
+
+.ca-anim-slide-up {
+    animation: ca-slide-up 0.5s ease-out forwards;
+}
+
+.ca-anim-scale-in {
+    animation: ca-scale-in 0.35s ease-out forwards;
+}
+
+.ca-anim-pulse {
+    animation: ca-pulse-soft 1.3s ease-out infinite;
+}
+
+/* Estado inicial oculto para elementos que se mostrarán via JS */
+.ca-anim-hidden {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+/* Pequeña animación al pasar sobre tarjetas del dashboard */
+.ca-card-hover {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ca-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16);
+}

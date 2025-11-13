@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2 class="text-3xl font-bold text-gray-800 mb-6">Chat con el Agente IA</h2>
+
+<div class="bg-white p-6 rounded-xl shadow-md border border-mintgreen max-w-3xl mx-auto">
+
+    <div id="chatWindow"
+         class="h-96 overflow-y-auto p-4 bg-gray-100 rounded-lg space-y-3">
+        <!-- mensajes aquí -->
+    </div>
+
+    <div class="mt-4 flex gap-4">
+        <input id="chatInput"
+               type="text"
+               placeholder="Escribe tu mensaje…"
+               class="flex-1 p-3 border rounded-md focus:ring-turquoise">
+        
+        <button id="btnSend"
+                class="px-6 py-3 bg-turquoise text-white rounded-lg shadow hover:bg-cyanlight transition">
+            Enviar
+        </button>
+    </div>
+
+</div>
+
+<script defer src="{{ url_for('static', filename='js/chat.js') }}"></script>
+
+{% endblock %}

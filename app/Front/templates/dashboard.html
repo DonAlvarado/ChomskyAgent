@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div data-page="dashboard">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Analizador -->
+        <a href="/analyzer"
+           data-dashboard-card
+           class="p-6 bg-white rounded-xl shadow border border-mintgreen hover:shadow-lg transition">
+           
+            <div class="flex items-center gap-3 mb-2">
+                <img src="{{ url_for('static', filename='icons/analizer.svg') }}" class="w-6 h-6 opacity-80">
+                <h3 class="text-xl font-semibold text-turquoise">Analizador</h3>
+            </div>
+
+            <p class="text-gray-600 mt-2">Analiza gramáticas y autómatas automáticamente.</p>
+        </a>
+
+        <!-- Tutor -->
+        <a href="/tutor"
+           data-dashboard-card
+           class="p-6 bg-white rounded-xl shadow border border-mintgreen hover:shadow-lg transition">
+
+            <div class="flex items-center gap-3 mb-2">
+                <img src="{{ url_for('static', filename='icons/tutor.svg') }}" class="w-6 h-6 opacity-80">
+                <h3 class="text-xl font-semibold text-turquoise">Tutor</h3>
+            </div>
+
+            <p class="text-gray-600 mt-2">Ejercicios y modo quiz para practicar.</p>
+        </a>
+
+        <!-- Chat IA -->
+        <a href="/chat"
+           data-dashboard-card
+           class="p-6 bg-white rounded-xl shadow border border-mintgreen hover:shadow-lg transition">
+
+            <div class="flex items-center gap-3 mb-2">
+                <img src="{{ url_for('static', filename='icons/chat.svg') }}" class="w-6 h-6 opacity-80">
+                <h3 class="text-xl font-semibold text-turquoise">Chat IA</h3>
+            </div>
+
+            <p class="text-gray-600 mt-2">Pregúntale al agente explicativo.</p>
+        </a>
+
+    </div>
+</div>
+
+{% endblock %}

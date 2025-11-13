@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title or "ChomskyAgent" }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+
+
+    <!-- Tailwind compilado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+
+    <!-- Módulos de estilos adicionales -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+
+    <!-- JS global -->
+    <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/animations.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</head>
+
+
+<body class="bg-[#F5F4EE] text-gray-900">
+    <!-- Navbar -->
+    <nav class="w-full bg-turquoise px-6 py-3 text-gray-900 shadow-md flex justify-between items-center">
+        <h1 class="font-bold text-xl flex items-center gap-2">
+            <img src="{{ url_for('static', filename='icons/dashboard.svg') }}" class="w-5 h-5 opacity-90">
+            ChomskyAgent
+        </h1>
+
+        <div class="flex gap-6 items-center text-sm">
+
+            <a class="flex items-center gap-1 px-2 py-1 rounded-md hover:text-gray-700 hover:bg-white/20 transition"
+            href="/">
+                <img src="{{ url_for('static', filename='icons/home.svg') }}" class="w-4 h-4">
+                Inicio
+            </a>
+
+            <a class="flex items-center gap-1 px-2 py-1 rounded-md hover:text-gray-700 hover:bg-white/20 transition"
+            href="/dashboard">
+                <img src="{{ url_for('static', filename='icons/dashboard.svg') }}" class="w-4 h-4">
+                Dashboard
+            </a>
+
+            <a class="flex items-center gap-1 px-2 py-1 rounded-md hover:text-gray-700 hover:bg-white/20 transition"
+            href="/analyzer">
+                <img src="{{ url_for('static', filename='icons/analizer.svg') }}" class="w-4 h-4">
+                Analizador
+            </a>
+
+            <a class="flex items-center gap-1 px-2 py-1 rounded-md hover:text-gray-700 hover:bg-white/20 transition"
+            href="/tutor">
+                <img src="{{ url_for('static', filename='icons/tutor.svg') }}" class="w-4 h-4">
+                Tutor
+            </a>
+
+            <a class="flex items-center gap-1 px-2 py-1 rounded-md hover:text-gray-700 hover:bg-white/20 transition"
+            href="/chat">
+                <img src="{{ url_for('static', filename='icons/chat.svg') }}" class="w-4 h-4">
+                Chat
+            </a>
+
+            <a class="flex items-center gap-1 px-2 py-1 rounded-md hover:text-gray-700 hover:bg-white/20 transition"
+            href="/reports">
+                <img src="{{ url_for('static', filename='icons/reportes.svg') }}" class="w-4 h-4">
+                Reportes
+            </a>
+
+            <a class="flex items-center gap-1 px-2 py-1 rounded-md hover:text-gray-700 hover:bg-white/20 transition"
+            href="/about">
+                <img src="{{ url_for('static', filename='icons/acerca.svg') }}" class="w-4 h-4">
+                Acerca
+            </a>
+
+        </div>
+    </nav>
+
+
+
+
+    <!-- Contenido dinámico -->
+    <main class="p-6">
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>
