@@ -3,15 +3,16 @@
 
 <h2 class="text-3xl font-bold text-gray-800 mb-6">Analizador de Gramáticas / Autómatas</h2>
 
-<div class="bg-white p-6 rounded-xl shadow-md border border-mintgreen">
+<!--  ANALIZADOR DE GRAMÁTICAS -->
+<div class="bg-white p-6 rounded-xl shadow-md border border-mintgreen mb-12">
 
     <label class="block font-semibold text-gray-700 mb-2">
         Ingresa reglas de la gramática (una por línea):
     </label>
 
     <textarea id="grammarInput"
-              class="w-full h-40 p-3 border rounded-md focus:ring-2 focus:ring-turquoise"
-              placeholder="S → aSb&#10;S → ab"></textarea>
+              class="w-full h-40 p-3 border rounded-md focus:ring-2 focus:ring-turquoise font-mono"
+              placeholder="S -> aA | b&#10;A -> aS | b"></textarea>
 
     <button id="btnAnalyze"
             class="mt-4 px-6 py-3 bg-turquoise text-white rounded-lg shadow hover:bg-cyanlight transition">
@@ -26,6 +27,57 @@
 
 </div>
 
+
+<!--  ANALIZADOR DE AUTÓMATAS -->
+<div class="bg-white p-6 rounded-xl shadow-md border border-mintgreen">
+
+    <label class="block font-semibold text-gray-700 mb-2">
+        Ingresa el autómata (en formato JSON):
+    </label>
+
+    <textarea id="automatonInput"
+              class="w-full h-48 p-3 border rounded-md focus:ring-2 focus:ring-turquoise font-mono"
+              placeholder='{
+  "states": ["q0", "q1"],
+  "alphabet": ["a","b"],
+  "start": "q0",
+  "accept": ["q1"],
+  "transitions": {
+    "q0": {"a": ["q1"], "b": ["q0"]},
+    "q1": {"a": ["q1"], "b": ["q0"]}
+  }
+}'></textarea>
+
+    <div class="mt-4 flex gap-4 flex-wrap">
+        <button id="btnAnalyzeAutomaton"
+                class="px-6 py-3 bg-turquoise text-white rounded-lg shadow hover:bg-cyanlight transition">
+            Analizar Autómata
+        </button>
+
+        <button id="btnAutomatonDiagram"
+                class="px-6 py-3 bg-white text-turquoise border border-turquoise rounded-lg hover:bg-mintgreen/20 transition">
+            Ver diagrama
+        </button>
+    </div>
+
+    <div id="automatonOutput" class="mt-6 hidden">
+        <h3 class="text-xl font-bold text-gray-800">Resultado:</h3>
+        <p id="automatonType" class="mt-2 text-lg font-semibold text-turquoise"></p>
+        <ul id="automatonExplain" class="mt-4 list-disc pl-6 text-gray-700"></ul>
+    </div>
+
+    <div id="automatonDiagram" class="mt-8 hidden">
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Diagrama del Autómata:</h3>
+        <div class="border rounded-xl p-4 overflow-auto bg-gray-50">
+            <div id="automatonSvgContainer" class="w-full"></div>
+        </div>
+    </div>
+
+</div>
+
+
+<!--  SCRIPTS  -->
 <script defer src="{{ url_for('static', filename='js/analyzer.js') }}"></script>
+<script defer src="{{ url_for('static', filename='js/automata.js') }}"></script>
 
 {% endblock %}

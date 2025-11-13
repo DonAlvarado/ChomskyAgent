@@ -1,6 +1,4 @@
-# ============================================
 # 🧠 ChomskyAgent - .gitignore Oficial
-# ============================================
 
 # ============================================
 # PYTHON / FLASK
@@ -103,11 +101,3 @@ desktop.ini
 $RECYCLE.BIN/
 .Trash-*
 *.lnk
-
-# ============================================
-# DOCUMENTOS (no ignoramos README ni context)
-# ============================================
-# Mantener:
-# - README_ARCHITECTURE.md
-# - CONTEXT_PROJECT.txt
-# - ChomskyAgent.txt

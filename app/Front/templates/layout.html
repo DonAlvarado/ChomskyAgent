@@ -24,7 +24,7 @@
     <!-- Navbar -->
     <nav class="w-full bg-turquoise px-6 py-3 text-gray-900 shadow-md flex justify-between items-center">
         <h1 class="font-bold text-xl flex items-center gap-2">
-            <img src="{{ url_for('static', filename='icons/dashboard.svg') }}" class="w-5 h-5 opacity-90">
+            <img src="{{ url_for('static', filename='icons/favicon.ico') }}" class="w-5 h-5 opacity-90">
             ChomskyAgent
         </h1>
 
@@ -47,6 +47,13 @@
                 <img src="{{ url_for('static', filename='icons/analizer.svg') }}" class="w-4 h-4">
                 Analizador
             </a>
+
+            <a class="flex items-center gap-1 px-2 py-1 rounded-md hover:text-gray-700 hover:bg-white/20 transition"
+            href="/converter">
+                <img src="{{ url_for('static', filename='icons/analizer.svg') }}" class="w-4 h-4">
+                Converter
+            </a>
+
 
             <a class="flex items-center gap-1 px-2 py-1 rounded-md hover:text-gray-700 hover:bg-white/20 transition"
             href="/tutor">

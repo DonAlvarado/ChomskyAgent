@@ -1,15 +1,5 @@
-# setup_structure.py
-"""
-Script automático para crear la estructura base del proyecto ChomskyAgent.
-Ejecutar con:
-    python setup_structure.py
-"""
-
 import os
 
-# ===============================
-# Árbol base del proyecto
-# ===============================
 PROJECT_STRUCTURE = {
     "app": {
         "Back": {
@@ -109,17 +99,12 @@ PROJECT_STRUCTURE = {
     ],
 }
 
-# ===============================
-# Funciones de creación
-# ===============================
 def create_file(path, content=""):
-    """Crea un archivo con contenido opcional."""
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
 
 
 def create_structure(base_path, structure):
-    """Crea recursivamente carpetas y archivos."""
     for name, content in structure.items():
         if name == "files":
             for file_name in content:
@@ -136,11 +121,8 @@ def create_structure(base_path, structure):
                     create_file(path, f"# Placeholder for {file_name}\n")
 
 
-# ===============================
-# Ejecución principal
-# ===============================
 if __name__ == "__main__":
     BASE_DIR = os.path.join(os.getcwd(), "ChomskyAgent")
     os.makedirs(BASE_DIR, exist_ok=True)
     create_structure(BASE_DIR, PROJECT_STRUCTURE)
-    print("✅ Estructura de proyecto ChomskyAgent creada con éxito.")
+    print("Estructura de proyecto ChomskyAgent creada con éxito.")

@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const div = document.createElement("div");
         div.className =
             sender === "user"
-                ? "bg-turquoise text-white p-3 rounded-lg w-fit ml-auto"
-                : "bg-gray-200 text-gray-800 p-3 rounded-lg w-fit";
+                ? "bg-turquoise text-white p-3 rounded-lg w-fit ml-auto my-1"
+                : "bg-gray-200 text-gray-800 p-3 rounded-lg w-fit my-1";
 
         div.textContent = text;
         chatWindow.appendChild(div);
@@ -16,8 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
         chatWindow.scrollTo(0, chatWindow.scrollHeight);
     }
 
-    btnSend.addEventListener("click", async () => {
-
+    async function sendMessage() {
         const msg = chatInput.value.trim();
         if (!msg) return;
 
@@ -32,11 +31,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await res.json();
 
-        appendMessage(data.reply, "ai");
-    });
+        const reply = data.reply;
+        const textToShow =
+            typeof reply === "string"
+                ? reply
+                : JSON.stringify(reply, null, 2);
 
-    // Enter para enviar
+        appendMessage(textToShow, "ai");
+    }
+
+    btnSend.addEventListener("click", sendMessage);
+
     chatInput.addEventListener("keypress", e => {
-        if (e.key === "Enter") btnSend.click();
+        if (e.key === "Enter") {
+            e.preventDefault();
+            sendMessage();
+        }
     });
 });
