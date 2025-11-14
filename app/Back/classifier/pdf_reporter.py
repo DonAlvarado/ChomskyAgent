@@ -6,20 +6,28 @@ import os
 import uuid
 from graphviz import Source
 
+from Back.utils.file_manager import ensure_dir
+from Back.utils.logger import get_logger
 
-OUTPUT_DIR = "app/static/generated"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+OUTPUT_DIR = os.path.join(BASE_DIR, "..", "..", "Front", "static", "generated")
+OUTPUT_DIR = os.path.normpath(OUTPUT_DIR)
+
+log = get_logger("PDFReporter")
 
 
 class PDFReporter:
 
     def __init__(self):
-        os.makedirs(OUTPUT_DIR, exist_ok=True)
+        ensure_dir(OUTPUT_DIR)
 
     def _save_diagram(self, dot: str) -> str:
         g = Source(dot)
         img_path = os.path.join(OUTPUT_DIR, f"{uuid.uuid4()}.png")
         g.render(img_path, format="png", cleanup=True)
-        return img_path + ".png"
+        full_path = img_path + ".png"
+        log.info(f"Diagrama guardado en {full_path}")
+        return full_path
 
     def generate_pdf(self, title: str, info: dict, dot: str = None) -> str:
         file_path = os.path.join(OUTPUT_DIR, f"{uuid.uuid4()}.pdf")
@@ -47,4 +55,5 @@ class PDFReporter:
             c.drawImage(ImageReader(img), 40, y - 240, width=400, height=240)
 
         c.save()
+        log.info(f"PDF generado en {file_path}")
         return file_path

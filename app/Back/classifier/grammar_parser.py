@@ -4,6 +4,10 @@ from typing import Dict, List, Set, Iterable, Optional
 import re
 import uuid
 
+from Back.utils.logger import get_logger
+
+log = get_logger("GrammarParser")
+
 
 @dataclass
 class Grammar:
@@ -47,9 +51,24 @@ def _split(rhs: str) -> List[str]:
 
 def _tokens(rhs_alt: str) -> List[str]:
     rhs_alt = rhs_alt.strip()
-    if " " in rhs_alt:
-        return [t for t in rhs_alt.split(" ") if t]
-    return list(rhs_alt)
+    toks = []
+    buf = ""
+
+    for c in rhs_alt:
+        if c.isupper():
+            if buf:
+                toks.append(buf)
+                buf = ""
+            toks.append(c)
+        else:
+            buf += c
+
+    if buf:
+        toks.append(buf)
+
+    return toks
+
+
 
 
 def _is_nt(sym: str) -> bool:
@@ -80,6 +99,7 @@ def parse_grammar(rules: Iterable[str], start_symbol: Optional[str] = None) -> G
         raw_rules.append(cleaned)
         m = _RULE.match(cleaned)
         if not m:
+            log.error(f"Regla inválida detectada: '{cleaned}'")
             raise ValueError(f"Regla inválida: '{cleaned}'")
 
         lhs = m.group("lhs").strip()
@@ -109,7 +129,7 @@ def parse_grammar(rules: Iterable[str], start_symbol: Optional[str] = None) -> G
     if start not in nonterms:
         nonterms.add(start)
 
-    return Grammar(
+    g = Grammar(
         id=str(uuid.uuid4()),
         raw_rules=raw_rules,
         productions=productions,
@@ -117,3 +137,6 @@ def parse_grammar(rules: Iterable[str], start_symbol: Optional[str] = None) -> G
         terminals=terms,
         start_symbol=start,
     )
+
+    log.info(f"Gramática parseada con {len(g.productions)} no terminales y {len(g.terminals)} terminales.")
+    return g

@@ -3,12 +3,16 @@ from typing import Any
 from graphviz import Digraph
 
 from Back.interfaces.IVisualizer import IVisualizer
+from Back.utils.graph_utils import create_graph
+from Back.utils.logger import get_logger
+
+log = get_logger("Visualizer")
 
 
 class DFAVisualizer(IVisualizer):
     def visualize(self, dfa: Any) -> str:
-        g = Digraph()
-        g.attr(rankdir="LR")
+        # Devolvemos DOT (g.source), NO SVG
+        g: Digraph = create_graph("LR")
         g.node("", shape="none")
 
         # estados
@@ -22,24 +26,21 @@ class DFAVisualizer(IVisualizer):
         # transiciones
         for q, moves in dfa.transitions.items():
             for sym, dst_list in moves.items():
-
-                # AFD → cada transición tiene UNA lista con 1 estado:
-                # ej:  "a": ["q1"]
+                # AFD: podría venir como lista o string
                 if isinstance(dst_list, list) and len(dst_list) == 1:
                     dst = dst_list[0]
                 else:
-                    # si no es lista, fallback (pero no debería pasar)
                     dst = dst_list
-
                 g.edge(q, dst, label=sym)
 
-        return g.source
+        dot = g.source
+        log.debug("DOT generado para DFA.")
+        return dot
 
 
 class NFAVisualizer(IVisualizer):
     def visualize(self, nfa: Any) -> str:
-        g = Digraph()
-        g.attr(rankdir="LR")
+        g: Digraph = create_graph("LR")
         g.node("", shape="none")
 
         for q in nfa.states:
@@ -53,13 +54,14 @@ class NFAVisualizer(IVisualizer):
                 for dst in dsts:
                     g.edge(q, dst, label=sym)
 
-        return g.source
+        dot = g.source
+        log.debug("DOT generado para NFA.")
+        return dot
 
 
 class GrammarVisualizer(IVisualizer):
     def visualize(self, grammar: Any) -> str:
-        g = Digraph()
-        g.attr(rankdir="LR")
+        g: Digraph = create_graph("LR")
         g.node("", shape="none")
 
         for nt in grammar.nonterminals:
@@ -84,4 +86,6 @@ class GrammarVisualizer(IVisualizer):
                     a, B = toks
                     g.edge(A, B, label=a)
 
-        return g.source
+        dot = g.source
+        log.debug("DOT generado para gramática.")
+        return dot

@@ -1,8 +1,11 @@
 from flask import Blueprint, request, jsonify
 from Back.classifier.tutor_quiz import TutorQuiz
 
+from Back.utils.logger import get_logger
+
 tutor_api_bp = Blueprint("tutor_api_bp", __name__)
 quiz = TutorQuiz()
+log = get_logger("TutorAPI")
 
 
 @tutor_api_bp.post("/question")
@@ -11,7 +14,9 @@ def generate_question():
     difficulty = data.get("difficulty", "basic")
 
     q = quiz.make_question(difficulty)
+
     if "error" in q:
+        log.error(f"Error generando pregunta: {q['error']}")
         return jsonify({"success": False, "error": q["error"]}), 400
 
     return jsonify({
@@ -39,4 +44,5 @@ def check_answer():
         })
 
     except Exception as e:
+        log.error(f"Error evaluando respuesta: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 400

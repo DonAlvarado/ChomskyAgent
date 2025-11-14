@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         list.innerHTML = "";
 
-        const reports = data.reports || [];
+        const reports = data.files || [];
 
         reports.forEach(fileName => {
             const li = document.createElement("li");

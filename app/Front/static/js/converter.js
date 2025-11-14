@@ -3,9 +3,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const outBox = document.getElementById("convOutput");
     const result = document.getElementById("convResult");
 
-    // Mostrar texto formateado en el output
+    // Mostrar texto o SVG interpretado correctamente
     function show(text) {
-        result.textContent = text;
+        result.innerHTML = text; 
         outBox.classList.remove("hidden");
     }
 
@@ -23,9 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await res.json();
 
         if (!data.success) {
-            show("Error: " + (data.error || "No se pudo convertir la expresión."));
+            show(`<span class="text-red-600 font-bold">Error:</span> ${data.error || "No se pudo convertir la expresión."}`);
         } else {
-            show(JSON.stringify(data, null, 2));
+            // Mostramos JSON formateado (solo texto, no SVG)
+            show(`<pre class="whitespace-pre-wrap">${JSON.stringify(data, null, 2)}</pre>`);
         }
     }
 
@@ -46,21 +47,30 @@ document.addEventListener("DOMContentLoaded", () => {
         callEndpoint("regex2afd_min");
     });
 
+    // Visualizar AFD minimizado (SVG)
     document.getElementById("btnVisualizeAFDMin").addEventListener("click", async () => {
-    const txt = document.getElementById("convResult").textContent.trim();
-    if (!txt) return alert("Primero genera el AFD minimizado.");
+        const txt = document.getElementById("convResult").textContent.trim();
+        if (!txt) return alert("Primero genera el AFD minimizado.");
 
-    const json = JSON.parse(txt);
-    if (!json.afd_min) return alert("El resultado actual no es un AFD minimizado.");
+        let json;
+        try {
+            json = JSON.parse(txt);
+        } catch (e) {
+            return alert("El resultado actual no es válido o no contiene JSON.");
+        }
 
-    const res = await fetch("/api/automata/visualize_min", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ afd_min: json.afd_min })
-    });
+        if (!json.afd_min) return alert("El resultado actual no contiene un AFD minimizado.");
 
-    const data = await res.json();
-    if (!data.success) return alert("No se pudo visualizar el AFD minimizado.");
+        const res = await fetch("/api/automata/visualize_min", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ afd_min: json.afd_min })
+        });
+
+        const data = await res.json();
+        if (!data.success) return alert("No se pudo visualizar el AFD minimizado.");
+
+        // data.svg es SVG válido → renderizar inline
         show(data.svg);
     });
 

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="p-6">
+    <h2 class="text-3xl font-bold mb-4">Comparar Gramáticas</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <textarea id="g1" class="p-3 border rounded h-48 w-full"
+                  placeholder="Gramática 1&#10;Ej:&#10;S → aSb&#10;S → ab"></textarea>
+
+        <textarea id="g2" class="p-3 border rounded h-48 w-full"
+                  placeholder="Gramática 2&#10;Ej:&#10;S → aA&#10;A → Sb&#10;A → b"></textarea>
+    </div>
+
+    <button id="compare-btn"
+            class="mt-4 px-5 py-3 bg-turquoise text-white rounded shadow hover:bg-mintgreen transition">
+        Comparar
+    </button>
+
+    <div id="compare-result" class="mt-4 text-lg font-semibold"></div>
+</div>
+
+<!-- Cargar el JS específico de esta vista -->
+<script src="{{ url_for('static', filename='js/compare.js') }}"></script>
+{% endblock %}

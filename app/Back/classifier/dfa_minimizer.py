@@ -1,5 +1,8 @@
 from typing import Dict, Set
 from Back.classifier.converter import DFA
+from Back.utils.logger import get_logger
+
+log = get_logger("DfaMinimizer")
 
 
 def minimize_dfa(dfa: DFA) -> DFA:
@@ -9,11 +12,11 @@ def minimize_dfa(dfa: DFA) -> DFA:
     accept = dfa.accept
     start = dfa.start
 
-    # Separar aceptadores y no aceptadores
+    original_states = len(states)
+
     P = [set(accept), set(states) - set(accept)]
     W = [set(accept)]
 
-    # Hopcroft
     while W:
         A = W.pop()
         for c in alphabet:
@@ -38,7 +41,6 @@ def minimize_dfa(dfa: DFA) -> DFA:
                     new_P.append(Y)
             P = new_P
 
-    # Renombrado limpio: Q0, Q1, Q2...
     block_map = {}
     new_states = []
     for idx, block in enumerate(P):
@@ -47,21 +49,22 @@ def minimize_dfa(dfa: DFA) -> DFA:
         for s in block:
             block_map[s] = name
 
-    # Nuevo start y aceptadores
     new_start = block_map[start]
     new_accept = {block_map[s] for s in accept}
 
-    # Nuevas transiciones
     new_trans = {q: {} for q in new_states}
     for old in states:
         qnew = block_map[old]
         for sym, dst in transitions.get(old, {}).items():
             new_trans[qnew][sym] = block_map[dst]
 
-    return DFA(
+    minimized = DFA(
         states=set(new_states),
         alphabet=alphabet,
         start=new_start,
         accept=new_accept,
         transitions=new_trans
     )
+
+    log.info(f"AFD minimizado: {original_states} → {len(minimized.states)} estados.")
+    return minimized

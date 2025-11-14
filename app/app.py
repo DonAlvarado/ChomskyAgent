@@ -25,6 +25,7 @@ def create_app():
     from Back.front_cntrlls.chat_routes import chat_bp
     from Back.front_cntrlls.report_routes import report_pages_bp
     from Back.front_cntrlls.converter_routes import converter_routes_bp
+    from Back.front_cntrlls.compare_routes import compare_routes_bp
 
     app.register_blueprint(home_bp)                  # /
     app.register_blueprint(dashboard_bp)             # /dashboard
@@ -33,6 +34,7 @@ def create_app():
     app.register_blueprint(chat_bp)                  # /chat
     app.register_blueprint(report_pages_bp)          # /reports
     app.register_blueprint(converter_routes_bp)      # /converter
+    app.register_blueprint(compare_routes_bp)        # /compare
 
     # ---- APIs REST (JSON) ----
     from Back.api.grammar_api import grammar_api_bp
@@ -41,6 +43,7 @@ def create_app():
     from Back.api.report_api import report_api_bp
     from Back.api.tutor_api import tutor_api_bp
     from Back.api.agent_api import agent_api_bp
+    from Back.api.compare_api import compare_api_bp
 
     app.register_blueprint(grammar_api_bp, url_prefix="/api/grammar")
     app.register_blueprint(automata_api_bp, url_prefix="/api/automata")
@@ -48,6 +51,7 @@ def create_app():
     app.register_blueprint(report_api_bp, url_prefix="/api/report")
     app.register_blueprint(tutor_api_bp, url_prefix="/api/tutor")
     app.register_blueprint(agent_api_bp, url_prefix="/api/agent")
+    app.register_blueprint(compare_api_bp, url_prefix="/api/compare")
 
     # Rutas de prueba / healthcheck
     @app.get("/ping")

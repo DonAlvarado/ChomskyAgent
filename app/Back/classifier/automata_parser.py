@@ -2,6 +2,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Set, Optional
 
+from Back.utils.validators import is_valid_automaton
+from Back.utils.logger import get_logger
+
+log = get_logger("AutomataParser")
+
 
 @dataclass
 class Automaton:
@@ -26,6 +31,10 @@ class Automaton:
 
 
 def parse_automaton(data: dict) -> Automaton:
+    if not is_valid_automaton(data):
+        log.error("Estructura básica de autómata inválida.")
+        raise ValueError("Formato de autómata inválido.")
+
     states = set(data.get("states") or [])
     alphabet = set(data.get("alphabet") or [])
     start = data.get("start")
@@ -60,7 +69,7 @@ def parse_automaton(data: dict) -> Automaton:
             trans[s][sym] = dst_list
 
     import uuid
-    return Automaton(
+    a = Automaton(
         id=str(uuid.uuid4()),
         states=states,
         alphabet=alphabet,
@@ -68,6 +77,8 @@ def parse_automaton(data: dict) -> Automaton:
         start=start,
         accept=accept,
     )
+    log.info(f"Autómata parseado correctamente con {len(states)} estados.")
+    return a
 
 
 def detect_type(a: Automaton) -> str:

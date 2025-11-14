@@ -1,111 +1,181 @@
 from __future__ import annotations
-from typing import Dict, Set
+from typing import Set, Tuple
+from collections import deque
 
-from Back.classifier.converter import (
-    nfa_epsilon_to_dfa,
-    dfa_to_regular_grammar,
-    grammar_to_afd
-)
+from Back.classifier.grammar_parser import Grammar
+from Back.classifier.automata_parser import Automaton
+from Back.utils.logger import get_logger
 
-# Minimización AFD
+log = get_logger("EquivalenceChecker")
 
-def minimize_dfa(dfa):
-    partitions = [set(dfa.accept), set(dfa.states - dfa.accept)]
-    stable = False
+# Limite de longitud para comparar lenguajes L ≤ N
+MAX_LEN = 6
 
-    while not stable:
-        stable = True
-        new_partitions = []
 
-        for group in partitions:
-            rep = next(iter(group))
-            buckets: Dict[str, Set[str]] = {}
+def _is_terminal_string(s: str) -> bool:
+    # asumimos: no terminal = mayúscula, terminal = lo demás
+    return all(not c.isupper() for c in s)
 
-            for state in group:
-                signature = []
-                for sym in dfa.alphabet:
-                    dst = dfa.transitions.get(state, {}).get(sym)
-                    part_id = next(
-                        (i for i, p in enumerate(partitions) if dst in p),
-                        None
-                    )
-                    signature.append(part_id)
-                signature = tuple(signature)
-                buckets.setdefault(signature, set()).add(state)
 
-            for b in buckets.values():
-                new_partitions.append(b)
+def _normalize_eps(s: str) -> str:
+    s = s.lower().strip()
+    return "" if s in {"ε", "eps", "epsilon", "λ", "lambda"} else None
 
-            if len(buckets.values()) > 1:
-                stable = False
 
-        partitions = new_partitions
+# =========================
+#   GRAMMARS
+# =========================
 
-    new_states = {f"M{i}": p for i, p in enumerate(partitions)}
-    inv = {frozenset(v): k for k, v in new_states.items()}
+def generate_from_grammar(g: Grammar, max_len: int = MAX_LEN) -> Set[str]:
+    """Genera todas las cadenas terminales de la gramática
+    con longitud ≤ max_len, mediante BFS sobre derivaciones."""
+    results: Set[str] = set()
+    q = deque()
 
-    trans = {}
-    for nid, group in new_states.items():
-        rep = next(iter(group))
-        trans[nid] = {}
-        for sym in dfa.alphabet:
-            dst = dfa.transitions.get(rep, {}).get(sym)
-            if dst:
-                target = next(p for p in partitions if dst in p)
-                trans[nid][sym] = inv[frozenset(target)]
+    # cadena inicial: símbolo de arranque
+    q.append(g.start_symbol)
+    visited = set([g.start_symbol])
 
-    start_group = next(p for p in partitions if dfa.start in p)
-    start = inv[frozenset(start_group)]
+    while q:
+        sentential = q.popleft()
 
-    accept = set()
-    for nid, group in new_states.items():
-        if group & dfa.accept:
-            accept.add(nid)
+        # longitud de la parte terminal
+        term_len = sum(1 for c in sentential if not c.isupper())
+        if term_len > max_len:
+            continue
 
-    from app.Back.classifier.converter import DFA
-    return DFA(
-        states=set(new_states.keys()),
-        alphabet=dfa.alphabet,
-        start=start,
-        accept=accept,
-        transitions=trans
-    )
+        # si ya no hay no terminales, es cadena candidata
+        if _is_terminal_string(sentential):
+            results.add(sentential)
+            continue
 
-# Convertir a AFD minimizado
+        # busca primer no terminal para expandir
+        idx = None
+        for i, c in enumerate(sentential):
+            if c.isupper():
+                idx = i
+                break
+        if idx is None:
+            continue
 
-def to_minimized_dfa(obj):
-    # Ya es AFD
-    if hasattr(obj, "transitions") and isinstance(obj.transitions, dict):
-        dfa = obj
-        return minimize_dfa(dfa)
+        nt = sentential[idx]
 
-    # Es AFN o AFN-e
-    if hasattr(obj, "alphabet") and isinstance(obj.accept, set):
-        from app.Back.classifier.automata_parser import detect_type
-        from app.Back.classifier.converter import regex_to_nfa_epsilon
-        typ = detect_type(obj)
-        if typ in ("AFN", "AFN-ε"):
-            dfa = nfa_epsilon_to_dfa(obj)
-            return minimize_dfa(dfa)
+        for rhs in g.productions.get(nt, []):
+            eps_norm = _normalize_eps(rhs)
+            if eps_norm is not None:
+                repl = eps_norm  # "" si era epsilon "real"
+            else:
+                repl = rhs
 
-    # Es gramática
-    if hasattr(obj, "productions"):
-        dfa = grammar_to_afd(obj)
-        return minimize_dfa(dfa)
+            new_sent = sentential[:idx] + repl + sentential[idx + 1:]
 
-    raise ValueError("Objeto no convertible a AFD minimizado.")
+            # pequeña poda para que no explote
+            new_term_len = sum(1 for c in new_sent if not c.isupper())
+            if new_term_len > max_len:
+                continue
 
-# Equivalencia
+            if new_sent not in visited:
+                visited.add(new_sent)
+                q.append(new_sent)
 
-def equivalent(obj1, obj2) -> bool:
-    d1 = to_minimized_dfa(obj1)
-    d2 = to_minimized_dfa(obj2)
+    log.info(f"Lenguaje generado por gramática (≤ {max_len}): {sorted(results)}")
+    return results
 
-    # Comparación directa del AFD minimizado
-    return (
-        d1.alphabet == d2.alphabet and
-        len(d1.states) == len(d2.states) and
-        d1.start == d2.start and
-        d1.accept == d2.accept and
-        d1.transitions == d2.transitions
-    )
+
+# =========================
+#   AUTOMATA
+# =========================
+
+def generate_from_automaton(a: Automaton, max_len: int = MAX_LEN) -> Set[str]:
+    """Genera todas las cadenas aceptadas por el autómata
+    con longitud ≤ max_len."""
+    results: Set[str] = set()
+    q = deque()
+
+    # estado, cadena_generada
+    q.append((a.start, ""))
+
+    visited: Set[Tuple[str, str]] = set()
+    visited.add((a.start, ""))
+
+    while q:
+        state, s = q.popleft()
+
+        if len(s) > max_len:
+            continue
+
+        if state in a.accept:
+            results.add(s)
+
+        # transiciones por símbolos
+        for sym in a.alphabet:
+            dsts = a.transitions.get(state, {}).get(sym, [])
+            for dst in dsts:
+                new_s = s + sym
+                if len(new_s) > max_len:
+                    continue
+                key = (dst, new_s)
+                if key not in visited:
+                    visited.add(key)
+                    q.append((dst, new_s))
+
+        # transiciones epsilon (si existen)
+        eps_dsts = a.transitions.get(state, {}).get("ε", [])
+        for dst in eps_dsts:
+            key = (dst, s)
+            if key not in visited:
+                visited.add(key)
+                q.append((dst, s))
+
+    log.info(f"Lenguaje generado por autómata (≤ {max_len}): {sorted(results)}")
+    return results
+
+
+# =========================
+#   API PÚBLICA
+# =========================
+
+def equivalent(obj1, obj2, max_len: int = MAX_LEN):
+    # Gramática vs Gramática
+    if isinstance(obj1, Grammar) and isinstance(obj2, Grammar):
+        L1 = generate_from_grammar(obj1, max_len)
+        L2 = generate_from_grammar(obj2, max_len)
+
+        eq = (L1 == L2)
+        diff1 = sorted(L1 - L2)
+        diff2 = sorted(L2 - L1)
+
+        explanation = {
+            "type": "grammar",
+            "max_len": max_len,
+            "equivalent": eq,
+            "L1": sorted(L1),
+            "L2": sorted(L2),
+            "L1_minus_L2": diff1,
+            "L2_minus_L1": diff2,
+        }
+
+        return explanation
+
+    # Autómata vs Automata
+    if isinstance(obj1, Automaton) and isinstance(obj2, Automaton):
+        L1 = generate_from_automaton(obj1, max_len)
+        L2 = generate_from_automaton(obj2, max_len)
+
+        eq = (L1 == L2)
+        diff1 = sorted(L1 - L2)
+        diff2 = sorted(L2 - L1)
+
+        explanation = {
+            "type": "automaton",
+            "max_len": max_len,
+            "equivalent": eq,
+            "L1": sorted(L1),
+            "L2": sorted(L2),
+            "L1_minus_L2": diff1,
+            "L2_minus_L1": diff2,
+        }
+
+        return explanation
+
+    raise ValueError("Solo se pueden comparar dos gramáticas o dos autómatas del mismo tipo.")

@@ -1,6 +1,10 @@
 from __future__ import annotations
 import random
 
+from Back.utils.logger import get_logger
+
+log = get_logger("ExampleGenerator")
+
 
 REGULAR_PRODUCTIONS = [
     {"S": ["aA", "bB"], "A": ["aS", "a"], "B": ["bS", "b"]},
@@ -20,15 +24,21 @@ REGEX_EXAMPLES = [
 
 
 def random_regular_grammar():
-    return random.choice(REGULAR_PRODUCTIONS)
+    g = random.choice(REGULAR_PRODUCTIONS)
+    log.debug(f"Gramática regular generada: {g}")
+    return g
 
 
 def random_cfl_grammar():
-    return random.choice(CFL_PRODUCTIONS)
+    g = random.choice(CFL_PRODUCTIONS)
+    log.debug(f"Gramática CFL generada: {g}")
+    return g
 
 
 def random_regex():
-    return random.choice(REGEX_EXAMPLES)
+    r = random.choice(REGEX_EXAMPLES)
+    log.debug(f"Regex generada: {r}")
+    return r
 
 
 def generate(type_hint: str) -> dict:
@@ -38,4 +48,5 @@ def generate(type_hint: str) -> dict:
         return {"productions": random_cfl_grammar(), "type": "Tipo 2"}
     if type_hint == "regex":
         return {"regex": random_regex()}
+    log.error(f"Tipo de ejemplo no reconocido: {type_hint}")
     return {"error": "tipo no reconocido"}

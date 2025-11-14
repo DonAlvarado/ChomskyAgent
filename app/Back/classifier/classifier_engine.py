@@ -2,6 +2,9 @@ from __future__ import annotations
 from typing import List
 
 from .grammar_parser import Grammar
+from Back.utils.logger import get_logger
+
+log = get_logger("ClassifierEngine")
 
 
 def _tokens(rhs_alt: str) -> List[str]:
@@ -74,7 +77,6 @@ def _all_context_sensitive(g: Grammar, steps: List[str]) -> bool:
 
 
 def classify_grammar(g: Grammar) -> Grammar:
-    """Clasifica una gramática en Tipo 0–3 y guarda el resultado en metadata."""
     steps: List[str] = []
     gtype = "Tipo 0 (Recursivamente enumerable)"
 
@@ -95,4 +97,8 @@ def classify_grammar(g: Grammar) -> Grammar:
         "type": gtype,
         "steps": steps,
     }
+
+    log.info(f"Gramática clasificada como {gtype}")
+    log.debug("Pasos de clasificación: " + " | ".join(steps))
+
     return g

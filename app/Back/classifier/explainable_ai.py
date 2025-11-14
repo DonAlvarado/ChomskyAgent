@@ -1,6 +1,10 @@
 from __future__ import annotations
 from typing import Dict, Any, List
 
+from Back.utils.logger import get_logger
+
+log = get_logger("ExplainableAI")
+
 
 class ExplainableAI:
 
@@ -9,6 +13,7 @@ class ExplainableAI:
         gtype = meta.get("type", "Desconocido")
         steps = meta.get("steps", [])
 
+        log.info(f"Explicación de gramática: {gtype}")
         return {
             "type": gtype,
             "steps": steps
@@ -26,12 +31,14 @@ class ExplainableAI:
         else:
             detail = "No se pudo determinar el tipo del autómata."
 
+        log.info(f"Explicación de autómata tipo {t}")
         return {
             "type": t,
             "explanation": detail
         }
 
     def explain_regex_conversion(self, regex: str, nfa, dfa) -> Dict[str, Any]:
+        log.info(f"Explicación conversión regex: '{regex}' → NFA/AFD")
         return {
             "regex": regex,
             "steps": [
@@ -56,9 +63,11 @@ class ExplainableAI:
         if not tips:
             tips.append("La gramática está en buena forma general.")
 
+        log.debug(f"Sugerencias generadas para gramática: {len(tips)}")
         return tips
 
     def explain_conversion_steps(self, steps: List[str]) -> Dict[str, Any]:
+        log.debug("Explicación de pasos de conversión generada.")
         return {
             "steps": steps
         }
