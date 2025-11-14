@@ -22,10 +22,7 @@ def _normalize_eps(s: str) -> str:
     return "" if s in {"ε", "eps", "epsilon", "λ", "lambda"} else None
 
 
-# =========================
 #   GRAMMARS
-# =========================
-
 def generate_from_grammar(g: Grammar, max_len: int = MAX_LEN) -> Set[str]:
     """Genera todas las cadenas terminales de la gramática
     con longitud ≤ max_len, mediante BFS sobre derivaciones."""
@@ -63,7 +60,7 @@ def generate_from_grammar(g: Grammar, max_len: int = MAX_LEN) -> Set[str]:
         for rhs in g.productions.get(nt, []):
             eps_norm = _normalize_eps(rhs)
             if eps_norm is not None:
-                repl = eps_norm  # "" si era epsilon "real"
+                repl = eps_norm 
             else:
                 repl = rhs
 
@@ -82,10 +79,7 @@ def generate_from_grammar(g: Grammar, max_len: int = MAX_LEN) -> Set[str]:
     return results
 
 
-# =========================
 #   AUTOMATA
-# =========================
-
 def generate_from_automaton(a: Automaton, max_len: int = MAX_LEN) -> Set[str]:
     """Genera todas las cadenas aceptadas por el autómata
     con longitud ≤ max_len."""
@@ -119,7 +113,7 @@ def generate_from_automaton(a: Automaton, max_len: int = MAX_LEN) -> Set[str]:
                     visited.add(key)
                     q.append((dst, new_s))
 
-        # transiciones epsilon (si existen)
+        # transiciones epsilon
         eps_dsts = a.transitions.get(state, {}).get("ε", [])
         for dst in eps_dsts:
             key = (dst, s)
@@ -131,9 +125,7 @@ def generate_from_automaton(a: Automaton, max_len: int = MAX_LEN) -> Set[str]:
     return results
 
 
-# =========================
 #   API PÚBLICA
-# =========================
 
 def equivalent(obj1, obj2, max_len: int = MAX_LEN):
     # Gramática vs Gramática

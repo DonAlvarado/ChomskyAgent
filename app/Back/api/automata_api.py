@@ -53,7 +53,6 @@ def visualize_automata():
 
         viz = DFAVisualizer() if atype == "AFD" else NFAVisualizer()
 
-        # visualizer devuelve DOT → aquí lo convertimos a SVG
         dot = viz.visualize(a)
         svg = Source(dot).pipe(format="svg").decode("utf-8")
 

@@ -24,6 +24,7 @@ GENERATED_DIR = os.path.normpath(os.path.join(
     BASE_DIR, "..", "..", "Front", "static", "generated"
 ))
 
+
 @report_api_bp.post("/generate")
 def generate_report():
     data = request.get_json() or {}
@@ -36,10 +37,12 @@ def generate_report():
     try:
         if rtype == "grammar":
             rules = data.get("rules", [])
+            start_symbol = data.get("start_symbol")
+
             if not is_valid_grammar(rules):
                 return jsonify({"success": False, "error": "Gramática inválida"}), 400
 
-            g = classify_grammar(parse_grammar(rules, data.get("start_symbol")))
+            g = classify_grammar(parse_grammar(rules, start_symbol))
             dot = GrammarVisualizer().visualize(g)
 
             info = {
@@ -85,21 +88,20 @@ def generate_report():
 
         path = reporter.generate_pdf(title, info, dot)
 
-        rel_path = path.split("app/Front/")[-1]
-        return jsonify({"success": True, "file": rel_path})
+        # Solo el nombre del archivo, no la ruta completa
+        file_name = os.path.basename(path)
 
+        return jsonify({"success": True, "file": file_name})
 
     except Exception as e:
         log.error(f"Error generando PDF: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
-    
+
+
 @report_api_bp.get("/list")
 def list_reports():
     try:
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        dir_path = os.path.normpath(os.path.join(
-            BASE_DIR, "..", "..", "Front", "static", "generated"
-        ))
+        dir_path = GENERATED_DIR
 
         if not os.path.exists(dir_path):
             return jsonify({"success": True, "files": []})

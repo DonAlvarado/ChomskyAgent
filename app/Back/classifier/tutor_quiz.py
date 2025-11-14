@@ -1,5 +1,6 @@
 from __future__ import annotations
 import uuid
+import random
 from typing import Dict, Any
 
 from Back.classifier.example_generator import generate
@@ -11,43 +12,56 @@ log = get_logger("TutorQuiz")
 
 
 class TutorQuiz:
+
+    # SELECCIÓN DE TIPOS: pesos
+    TYPE_WEIGHTS = {
+        "regular": 0.30,     # Tipo 3
+        "cfl": 0.30,         # Tipo 2
+        "context": 0.20,     # Tipo 1
+        "irrestrict": 0.20   # Tipo 0
+    }
+
+    # 1. GENERACIÓN DE PREGUNTAS
     def make_question(self, difficulty: str = "basic") -> Dict[str, Any]:
-        if difficulty == "basic":
-            example = generate("regular")
-            log.info("Pregunta generada (regular).")
-            return {
-                "id": str(uuid.uuid4()),
-                "type": "classify_grammar",
-                "question": example["productions"]
-            }
 
-        if difficulty == "cfl":
-            example = generate("cfl")
-            log.info("Pregunta generada (CFL).")
-            return {
-                "id": str(uuid.uuid4()),
-                "type": "classify_grammar",
-                "question": example["productions"]
-            }
+        # Selección ponderada según los pesos
+        types = list(self.TYPE_WEIGHTS.keys())
+        weights = list(self.TYPE_WEIGHTS.values())
 
-        log.error(f"Dificultad inválida: {difficulty}")
-        return {"error": "dificultad inválida"}
+        chosen = random.choices(types, weights)[0]
 
+        example = generate(chosen)
+
+        log.info(f"Pregunta generada tipo={example['type']} ({chosen}).")
+
+        return {
+            "id": str(uuid.uuid4()),
+            "type": "classify_grammar",
+            "question": example["productions"]
+        }
+
+    # 2. CORRECCIÓN DE RESPUESTA
     def check_answer(self, qtype: str, question: Dict[str, Any], answer: str) -> Dict[str, Any]:
+
         if qtype != "classify_grammar":
-            log.error(f"Tipo de pregunta inválido: {qtype}")
             return {"error": "tipo inválido"}
 
+        # Construir gramática
         prods = [f"{A} -> " + " | ".join(rhs) for A, rhs in question.items()]
         grammar = parse_grammar(prods)
         classified = classify_grammar(grammar)
-        correct_type = classified.metadata["classification"]["type"]
 
-        correct = (answer.strip().lower() == correct_type.lower())
+        correct_full = classified.metadata["classification"]["type"]
+        correct_simple = correct_full.split("(")[0].strip() 
+        user_simple = answer.strip()
 
-        log.info(f"Respuesta evaluada. Usuario: {answer}, Correcta: {correct_type}, Resultado: {correct}")
+        correct = (user_simple.lower() == correct_simple.lower())
+
+        log.info(
+            f"Tutor: usuario='{answer}', correcto='{correct_simple}', real='{correct_full}', result={correct}"
+        )
 
         return {
             "correct": correct,
-            "correct_type": correct_type,
+            "correct_type": correct_full
         }

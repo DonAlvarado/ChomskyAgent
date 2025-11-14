@@ -1,38 +1,41 @@
-from .reasoner import Reasoner
-from .action_manager import ActionManager
+# chatbot.py
+
+from AI.reasoner import Reasoner, Intent
+from AI.action_manager import ActionManager
+from AI.memory import SessionMemory
 
 
 class Chatbot:
-    def __init__(self):
+    """
+    Maneja la interacción entre usuario, Reasoner e ActionManager.
+    """
+
+    def __init__(self, base_url: str = "http://localhost:5000"):
         self.reasoner = Reasoner()
-        self.action_manager = ActionManager()
-        self.history = []
+        self.actions = ActionManager(base_url=base_url)
+        self.memory = SessionMemory(max_turns=20)
 
-    def handle(self, message: str) -> str:
-        self.history.append(("user", message))
+    def handle_message(self, message: str):
+        print("[DEBUG] Chatbot.handle_message EJECUTADO")
 
-        info = self.reasoner.process(message)
-        intent = info["intent"]
-        action = info["action"]
+        # 1. Guarda turno del usuario
+        self.memory.add_turn("user", message)
 
-        # Acciones principales delegadas a ActionManager
-        result = self.action_manager.execute(action, message)
+        # 2. Detecta intención
+        intent: Intent = self.reasoner.infer_intent(message)
 
-        # Si es smalltalk o no hay acción válida
-        if result is None:
-            result = self.smalltalk_reply(message)
+        # 3. Ejecuta acción correspondiente
+        raw_result = self.actions.execute(intent.action, message)
 
-        self.history.append(("agent", result))
-        return result
+        # 4. Formatea la respuesta
+        reply_text = self.reasoner.format_reply(intent, raw_result)
 
-    def smalltalk_reply(self, msg: str) -> str:
-        msg = msg.lower()
+        # 5. Guarda turno del agente
+        self.memory.add_turn("agent", reply_text, {"intent": intent.action})
 
-        if "hola" in msg or "buenas" in msg:
-            return "Hola, ¿qué necesitas analizar?"
-        if "gracias" in msg:
-            return "De nada."
-        if "qué tal" in msg or "como estas" in msg:
-            return "Listo para seguir trabajando con gramáticas y autómatas."
-
-        return "¿Deseas analizar algo o generar una explicación?"
+        # 6. Devuelve payload para endpoint Flask
+        return {
+            "reply": reply_text,
+            "intent": intent.action,
+            "raw_result": raw_result
+        }

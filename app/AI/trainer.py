@@ -63,10 +63,6 @@ TRAINING_DATA = [
 
 # 2. Entrenamiento
 def train_intent_model(output_path="intent_model.pkl"):
-    """
-    Entrena un modelo TF-IDF + LinearSVC basado en TRAINING_DATA.
-    Guarda el modelo en un archivo .pkl.
-    """
 
     texts = [t[0] for t in TRAINING_DATA]
     labels = [t[1] for t in TRAINING_DATA]

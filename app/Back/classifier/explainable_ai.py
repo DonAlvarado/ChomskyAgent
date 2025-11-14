@@ -1,73 +1,54 @@
-from __future__ import annotations
-from typing import Dict, Any, List
-
-from Back.utils.logger import get_logger
-
-log = get_logger("ExplainableAI")
-
+import re
 
 class ExplainableAI:
+    # 1. Extracción de reglas de gramática
+    def extract_rules(self, text: str):
 
-    def explain_grammar_classification(self, grammar) -> Dict[str, Any]:
-        meta = grammar.metadata.get("classification", {})
-        gtype = meta.get("type", "Desconocido")
-        steps = meta.get("steps", [])
+        pattern = r"([A-Za-z][A-Za-z0-9_]*)\s*->\s*([A-Za-z0-9_()+*?|]+)"
+        matches = re.findall(pattern, text)
+        rules = []
 
-        log.info(f"Explicación de gramática: {gtype}")
-        return {
-            "type": gtype,
-            "steps": steps
-        }
+        for left, right in matches:
+            left = left.strip()
+            right = right.strip()
+            if left and right:
+                rules.append((left, right))
 
-    def explain_automaton(self, automaton) -> Dict[str, Any]:
-        t = automaton.metadata.get("type") or "Desconocido"
+        return rules
 
-        if t == "AFD":
-            detail = "El autómata es determinista porque cada estado tiene a lo sumo una transición por símbolo."
-        elif t == "AFN":
-            detail = "El autómata es no determinista porque algún estado tiene múltiples transiciones para el mismo símbolo."
-        elif t == "AFN-ε":
-            detail = "El autómata es no determinista con epsilon porque existen transiciones ε."
-        else:
-            detail = "No se pudo determinar el tipo del autómata."
+    # 2. Extracción de autómatas
+    def extract_automaton_info(self, text: str):
+        pattern = r"\(\s*(.*?)\s*,\s*(.*?)\s*\)\s*=\s*(\S+)"
+        transitions = []
 
-        log.info(f"Explicación de autómata tipo {t}")
-        return {
-            "type": t,
-            "explanation": detail
-        }
+        for state, symbol, target in re.findall(pattern, text):
+            transitions.append((state, symbol, target))
 
-    def explain_regex_conversion(self, regex: str, nfa, dfa) -> Dict[str, Any]:
-        log.info(f"Explicación conversión regex: '{regex}' → NFA/AFD")
-        return {
-            "regex": regex,
-            "steps": [
-                "Se analizó la expresión regular.",
-                "Se construyó un AFN-ε mediante el algoritmo de Thompson.",
-                "Se aplicó clausura-ε y construcción por subconjuntos para obtener el AFD."
-            ],
-            "nfa_states": len(nfa.states),
-            "dfa_states": len(dfa.states)
-        }
+        return {"transitions": transitions}
 
-    def suggest_improvements(self, grammar) -> List[str]:
-        tips = []
+    # 3. Extracción de regex
+    def extract_regex_info(self, text: str):
+        pattern = r"[A-Za-z0-9()*+?|]+"
+        candidates = re.findall(pattern, text)
 
-        for A, alts in grammar.productions.items():
-            for rhs in alts:
-                if len(rhs) > 3:
-                    tips.append(f"La producción '{A} -> {rhs}' podría reescribirse en varias reglas más simples.")
-                if rhs == "ε" and A == grammar.start_symbol:
-                    tips.append("Considerar evitar ε-producciones en el símbolo inicial.")
+        candidates = [
+            c for c in candidates
+            if any(ch in c for ch in "|*+?()")
+        ]
 
-        if not tips:
-            tips.append("La gramática está en buena forma general.")
+        if not candidates:
+            return {"regex": None}
 
-        log.debug(f"Sugerencias generadas para gramática: {len(tips)}")
-        return tips
+        candidates.sort(key=len, reverse=True)
+        return {"regex": candidates[0]}
 
-    def explain_conversion_steps(self, steps: List[str]) -> Dict[str, Any]:
-        log.debug("Explicación de pasos de conversión generada.")
-        return {
-            "steps": steps
-        }
+    # 4. Explicación extendida de una gramática analizada
+    def explain_grammar(self, grammar_dict):
+        gtype = grammar_dict.get("type", "Desconocido")
+        steps = grammar_dict.get("steps", [])
+
+        text = f"Esta gramática es clasificada como {gtype}. Razones:\n"
+        for s in steps:
+            text += f" - {s}\n"
+
+        return text

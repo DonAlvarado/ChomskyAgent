@@ -17,7 +17,9 @@ def create_app():
     # Habilitar CORS
     CORS(app)
 
-    # ---- Vistas (HTML) ----
+    # ============================
+    # BLUEPRINTS DE VISTAS (HTML)
+    # ============================
     from Back.front_cntrlls.home_routes import home_bp
     from Back.front_cntrlls.dashboard_routes import dashboard_bp
     from Back.front_cntrlls.analyzer_routes import analyzer_bp
@@ -27,6 +29,10 @@ def create_app():
     from Back.front_cntrlls.converter_routes import converter_routes_bp
     from Back.front_cntrlls.compare_routes import compare_routes_bp
 
+    # NUEVO: Página Acerca de
+    from Back.front_cntrlls.about_routes import about_bp
+
+    # Registro de blueprints del Frontend
     app.register_blueprint(home_bp)                  # /
     app.register_blueprint(dashboard_bp)             # /dashboard
     app.register_blueprint(analyzer_bp)              # /analyzer
@@ -35,8 +41,11 @@ def create_app():
     app.register_blueprint(report_pages_bp)          # /reports
     app.register_blueprint(converter_routes_bp)      # /converter
     app.register_blueprint(compare_routes_bp)        # /compare
+    app.register_blueprint(about_bp)                 # /about
 
-    # ---- APIs REST (JSON) ----
+    # ============================
+    # BLUEPRINTS API (JSON)
+    # ============================
     from Back.api.grammar_api import grammar_api_bp
     from Back.api.automata_api import automata_api_bp
     from Back.api.converter_api import converter_api_bp
@@ -53,7 +62,9 @@ def create_app():
     app.register_blueprint(agent_api_bp, url_prefix="/api/agent")
     app.register_blueprint(compare_api_bp, url_prefix="/api/compare")
 
-    # Rutas de prueba / healthcheck
+    # ============================
+    # HEALTHCHECK
+    # ============================
     @app.get("/ping")
     def ping():
         return {"status": "ok", "app": "ChomskyAgent"}

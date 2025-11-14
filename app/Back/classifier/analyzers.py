@@ -29,7 +29,6 @@ class GrammarAnalyzer(IAnalyzer):
         rules = data.get("rules") or []
         start = data.get("start_symbol")
 
-        # Aquí dejamos que grammar_parser sea el que valide en detalle.
         try:
             g = parse_grammar(rules, start)
             g = classify_grammar(g)
